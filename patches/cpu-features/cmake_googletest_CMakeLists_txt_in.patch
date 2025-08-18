@@ -1,0 +1,10 @@
+diff --git a/cmake/googletest.CMakeLists.txt.in b/cmake/googletest.CMakeLists.txt.in
+index 8003c2c062ba41fe1faeb065d5adcc852bd7a853..155e371906c0577b9696460823a80da8f248cdb4 100644
+--- a/cmake/googletest.CMakeLists.txt.in
++++ b/cmake/googletest.CMakeLists.txt.in
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8.2)
++cmake_minimum_required(VERSION 3.13)
+ 
+ project(googletest-download NONE)
+ 
