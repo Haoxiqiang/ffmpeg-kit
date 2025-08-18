@@ -417,7 +417,9 @@ fi
 # LITE OPTIONS
 #--enable-small optimize for size instead of speed
 LITE_OPTIONS="$LITE_OPTIONS --enable-small"
+LITE_OPTIONS="$LITE_OPTIONS --disable-avfilter"
 LITE_OPTIONS="$LITE_OPTIONS --disable-network"
+LITE_OPTIONS="$LITE_OPTIONS --disable-avdevice"
 LITE_OPTIONS="$LITE_OPTIONS --disable-ffplay"
 # Component options:
 LITE_OPTIONS="$LITE_OPTIONS --disable-w32threads --disable-os2threads --disable-iconv"
@@ -518,6 +520,83 @@ if [[ $? -ne 0 ]]; then
   echo -e "failed\n\nSee build.log for details\n"
   exit 1
 fi
+
+# create ffmpeg unit so file
+echo "\n"
+rm libavcodec/log2_tab.o
+rm libavcodec/half2float.o
+rm libavcodec/reverse.o
+
+rm libavformat/golomb_tab.o
+rm libavformat/log2_tab.o
+rm libavformat/to_upper4.o
+rm libavformat/ac3_channel_layout_tab.o
+rm libavformat/dca_sample_rate_tab.o
+rm libavformat/jpegtables.o
+rm libavformat/mpeg4audio_sample_rates.o
+rm libavformat/mpegaudiotabs.o
+
+rm libswresample/log2_tab.o
+
+rm libswscale/log2_tab.o
+
+get_asm_sub_dirs() {
+  case ${ARCH} in
+  arm-v7a)
+    echo "arm"
+    ;;
+  arm-v7a-neon)
+    echo "arm neon"
+    ;;
+  arm64-v8a)
+    echo "aarch64 neon"
+    ;;
+  x86)
+    echo "x86"
+    ;;
+  x86-64)
+    echo "x86"
+    ;;
+  esac
+}
+
+FF_MODULE_DIRS="compat libavutil libswresample libswscale libavcodec libavformat"
+FF_ASSEMBLER_SUB_DIRS=$(get_asm_sub_dirs)
+FF_C_OBJ_FILES=
+FF_ASM_OBJ_FILES=
+for MODULE_DIR in $FF_MODULE_DIRS; do
+  C_OBJ_FILES="$MODULE_DIR/*.o"
+  if ls $C_OBJ_FILES 1>/dev/null 2>&1; then
+    echo "link $MODULE_DIR/*.o"
+    FF_C_OBJ_FILES="$FF_C_OBJ_FILES $C_OBJ_FILES"
+  fi
+
+  for ASM_SUB_DIR in $FF_ASSEMBLER_SUB_DIRS; do
+    ASM_OBJ_FILES="$MODULE_DIR/$ASM_SUB_DIR/*.o"
+    if ls $ASM_OBJ_FILES 1>/dev/null 2>&1; then
+      echo "link $MODULE_DIR/$ASM_SUB_DIR/*.o"
+      FF_ASM_OBJ_FILES="$FF_ASM_OBJ_FILES $ASM_OBJ_FILES"
+    fi
+  done
+done
+
+C_OBJ_FILES_DNN="libavfilter/dnn/*.o"
+if ls $C_OBJ_FILES_DNN 1>/dev/null 2>&1; then
+  echo "link $C_OBJ_FILES_DNN"
+  FF_C_OBJ_FILES="$FF_C_OBJ_FILES $C_OBJ_FILES_DNN"
+fi
+
+$CC -lm -lz -shared -fPIC --sysroot="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
+  -Wl,-Bsymbolic -fuse-ld=gold \
+  -Wl,-soname,libffmpeg.so \
+  ${FF_C_OBJ_FILES} \
+  ${FF_ASM_OBJ_FILES} \
+  -o ${LIB_INSTALL_BASE}/${LIB_NAME}/lib/libffmpeg.so \
+  -Wl,--whole-archive \
+  ${LDFLAGS} \
+  -Wl,--no-whole-archive
+
+${STRIP} ${LIB_INSTALL_BASE}/${LIB_NAME}/lib/libffmpeg.so
 
 # MANUALLY ADD REQUIRED HEADERS
 mkdir -p "${FFMPEG_LIBRARY_PATH}"/include/libavutil/x86 1>>"${BASEDIR}"/build.log 2>&1
