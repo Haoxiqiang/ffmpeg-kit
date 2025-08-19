@@ -50,6 +50,29 @@ public class FFmpegSession extends AbstractSession implements Session {
     /**
      * Builds a new FFmpeg session.
      *
+     * @param arguments              command arguments
+     * @param completeCallback       session specific complete callback
+     * @param logCallback            session specific log callback
+     * @param statisticsCallback     session specific statistics callback
+     * @param logRedirectionStrategy session specific log redirection strategy
+     */
+    private FFmpegSession(final String[] arguments,
+                          final FFmpegSessionCompleteCallback completeCallback,
+                          final LogCallback logCallback,
+                          final StatisticsCallback statisticsCallback,
+                          final LogRedirectionStrategy logRedirectionStrategy) {
+        super(arguments, logCallback, logRedirectionStrategy);
+
+        this.completeCallback = completeCallback;
+        this.statisticsCallback = statisticsCallback;
+
+        this.statistics = new LinkedList<>();
+        this.statisticsLock = new Object();
+    }
+
+    /**
+     * Builds a new FFmpeg session.
+     *
      * @param arguments command arguments
      * @return created session
      */
@@ -100,29 +123,6 @@ public class FFmpegSession extends AbstractSession implements Session {
                                        final StatisticsCallback statisticsCallback,
                                        final LogRedirectionStrategy logRedirectionStrategy) {
         return new FFmpegSession(arguments, completeCallback, logCallback, statisticsCallback, logRedirectionStrategy);
-    }
-
-    /**
-     * Builds a new FFmpeg session.
-     *
-     * @param arguments              command arguments
-     * @param completeCallback       session specific complete callback
-     * @param logCallback            session specific log callback
-     * @param statisticsCallback     session specific statistics callback
-     * @param logRedirectionStrategy session specific log redirection strategy
-     */
-    private FFmpegSession(final String[] arguments,
-                          final FFmpegSessionCompleteCallback completeCallback,
-                          final LogCallback logCallback,
-                          final StatisticsCallback statisticsCallback,
-                          final LogRedirectionStrategy logRedirectionStrategy) {
-        super(arguments, logCallback, logRedirectionStrategy);
-
-        this.completeCallback = completeCallback;
-        this.statisticsCallback = statisticsCallback;
-
-        this.statistics = new LinkedList<>();
-        this.statisticsLock = new Object();
     }
 
     /**

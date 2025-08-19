@@ -25,8 +25,6 @@ package com.arthenica.ffmpegkit;
 public class AbiDetect {
 
     static {
-        armV7aNeonLoaded = false;
-
         NativeLoader.loadFFmpegKitAbiDetect();
 
         /* ALL LIBRARIES LOADED AT STARTUP */
@@ -35,20 +33,10 @@ public class AbiDetect {
         FFprobeKit.class.getName();
     }
 
-    static final String ARM_V7A = "arm-v7a";
-
-    static final String ARM_V7A_NEON = "arm-v7a-neon";
-
-    private static boolean armV7aNeonLoaded;
-
     /**
      * Default constructor hidden.
      */
     private AbiDetect() {
-    }
-
-    static void setArmV7aNeonLoaded() {
-        armV7aNeonLoaded = true;
     }
 
     /**
@@ -57,11 +45,7 @@ public class AbiDetect {
      * @return ABI name loaded
      */
     public static String getAbi() {
-        if (armV7aNeonLoaded) {
-            return ARM_V7A_NEON;
-        } else {
-            return getNativeAbi();
-        }
+        return getNativeAbi();
     }
 
     /**

@@ -82,6 +82,15 @@ public enum Level {
     private final int value;
 
     /**
+     * Creates a new enum.
+     *
+     * @param value level value
+     */
+    Level(final int value) {
+        this.value = value;
+    }
+
+    /**
      * <p>Returns the enumeration defined by provided value.
      *
      * @param value level value
@@ -118,15 +127,6 @@ public enum Level {
      */
     public int getValue() {
         return value;
-    }
-
-    /**
-     * Creates a new enum.
-     *
-     * @param value level value
-     */
-    Level(final int value) {
-        this.value = value;
     }
 
 }

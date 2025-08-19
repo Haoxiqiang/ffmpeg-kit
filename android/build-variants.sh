@@ -114,7 +114,8 @@ show_help() {
 
 # 主函数
 main() {
-    export ANDROID_NDK_ROOT=${ANDROID_SDK_HOME}/ndk
+    export ANDROID_HOME=/home/haoxiqiang/Android/Sdk
+    export ANDROID_NDK_ROOT=${ANDROID_HOME}/ndk
     check_environment
     
     case "$1" in
@@ -125,8 +126,8 @@ main() {
             build_arm64_api29_ndk29
             ;;
         all)
-            build_armv7a_api26_ndk22
             build_arm64_api29_ndk29
+            build_armv7a_api26_ndk22
             ;;
         help|-h|--help)
             show_help

@@ -37,11 +37,9 @@ if [ -d "patches" ]; then
 fi
 
 # build 32 bits
-export ANDROID_NDK_ROOT=${ANDROID_SDK_HOME}/ndk/22.1.7171670c
-./android.sh --lts --api-level=26 --enable-gpl --disable-arm64-v8a --disable-x86-64 \
-  --enable-android-media-codec --enable-android-zlib --enable-x264
+export ANDROID_NDK_ROOT=${ANDROID_SDK_HOME}/ndk/22.1.7171670
+./android.sh --lts --api-level=26 --disable-arm64-v8a --disable-x86-64
 
 # build 64 bits
 export ANDROID_NDK_ROOT=${ANDROID_SDK_HOME}/ndk/29.0.13599879
-./android.sh --lts --api-level=29 --enable-gpl --disable-arm-v7a --disable-arm-v7a-neon --disable-x86 \
-  --enable-android-media-codec --enable-android-zlib --enable-x264
+./android.sh --lts --api-level=29 --disable-arm-v7a --disable-arm-v7a-neon --disable-x86

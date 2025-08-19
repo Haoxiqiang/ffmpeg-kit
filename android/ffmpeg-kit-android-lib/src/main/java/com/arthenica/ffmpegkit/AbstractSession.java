@@ -34,15 +34,13 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class AbstractSession implements Session {
 
     /**
-     * Generates unique ids for sessions.
-     */
-    protected static final AtomicLong sessionIdGenerator = new AtomicLong(1);
-
-    /**
      * Defines how long default "getAll" methods wait, in milliseconds.
      */
     public static final int DEFAULT_TIMEOUT_FOR_ASYNCHRONOUS_MESSAGES_IN_TRANSMIT = 5000;
-
+    /**
+     * Generates unique ids for sessions.
+     */
+    protected static final AtomicLong sessionIdGenerator = new AtomicLong(1);
     /**
      * Session identifier.
      */
@@ -57,56 +55,46 @@ public abstract class AbstractSession implements Session {
      * Date and time the session was created.
      */
     protected final Date createTime;
-
-    /**
-     * Date and time the session was started.
-     */
-    protected Date startTime;
-
-    /**
-     * Date and time the session has ended.
-     */
-    protected Date endTime;
-
     /**
      * Command arguments as an array.
      */
     protected final String[] arguments;
-
     /**
      * Log entries received for this session.
      */
     protected final List<Log> logs;
-
     /**
      * Log entry lock.
      */
     protected final Object logsLock;
-
-    /**
-     * Future created for sessions executed asynchronously.
-     */
-    protected Future<?> future;
-
-    /**
-     * State of the session.
-     */
-    protected SessionState state;
-
-    /**
-     * Return code for the completed sessions.
-     */
-    protected ReturnCode returnCode;
-
-    /**
-     * Stack trace of the error received while trying to execute this session.
-     */
-    protected String failStackTrace;
-
     /**
      * Session specific log redirection strategy.
      */
     protected final LogRedirectionStrategy logRedirectionStrategy;
+    /**
+     * Date and time the session was started.
+     */
+    protected Date startTime;
+    /**
+     * Date and time the session has ended.
+     */
+    protected Date endTime;
+    /**
+     * Future created for sessions executed asynchronously.
+     */
+    protected Future<?> future;
+    /**
+     * State of the session.
+     */
+    protected SessionState state;
+    /**
+     * Return code for the completed sessions.
+     */
+    protected ReturnCode returnCode;
+    /**
+     * Stack trace of the error received while trying to execute this session.
+     */
+    protected String failStackTrace;
 
     /**
      * Creates a new abstract session.
@@ -116,8 +104,8 @@ public abstract class AbstractSession implements Session {
      * @param logRedirectionStrategy session specific log redirection strategy
      */
     protected AbstractSession(final String[] arguments,
-                           final LogCallback logCallback,
-                           final LogRedirectionStrategy logRedirectionStrategy) {
+                              final LogCallback logCallback,
+                              final LogRedirectionStrategy logRedirectionStrategy) {
         this.sessionId = sessionIdGenerator.getAndIncrement();
         this.logCallback = logCallback;
         this.createTime = new Date();
@@ -289,6 +277,15 @@ public abstract class AbstractSession implements Session {
         return future;
     }
 
+    /**
+     * Sets the future created for this session.
+     *
+     * @param future future that runs this session asynchronously
+     */
+    void setFuture(final Future<?> future) {
+        this.future = future;
+    }
+
     @Override
     public void cancel() {
         if (state == SessionState.RUNNING) {
@@ -312,15 +309,6 @@ public abstract class AbstractSession implements Session {
                 }
             }
         }
-    }
-
-    /**
-     * Sets the future created for this session.
-     *
-     * @param future future that runs this session asynchronously
-     */
-    void setFuture(final Future<?> future) {
-        this.future = future;
     }
 
     /**

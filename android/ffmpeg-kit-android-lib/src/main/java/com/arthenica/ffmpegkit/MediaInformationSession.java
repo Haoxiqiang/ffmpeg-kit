@@ -26,14 +26,26 @@ package com.arthenica.ffmpegkit;
 public class MediaInformationSession extends AbstractSession implements Session {
 
     /**
+     * Session specific complete callback.
+     */
+    private final MediaInformationSessionCompleteCallback completeCallback;
+    /**
      * Media information extracted in the session.
      */
     private MediaInformation mediaInformation;
 
     /**
-     * Session specific complete callback.
+     * Creates a new media information session.
+     *
+     * @param arguments        command arguments
+     * @param completeCallback session specific complete callback
+     * @param logCallback      session specific log callback
      */
-    private final MediaInformationSessionCompleteCallback completeCallback;
+    private MediaInformationSession(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback, final LogCallback logCallback) {
+        super(arguments, logCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
+
+        this.completeCallback = completeCallback;
+    }
 
     /**
      * Creates a new media information session.
@@ -69,19 +81,6 @@ public class MediaInformationSession extends AbstractSession implements Session 
     }
 
     /**
-     * Creates a new media information session.
-     *
-     * @param arguments        command arguments
-     * @param completeCallback session specific complete callback
-     * @param logCallback      session specific log callback
-     */
-    private MediaInformationSession(final String[] arguments, final MediaInformationSessionCompleteCallback completeCallback, final LogCallback logCallback) {
-        super(arguments, logCallback, LogRedirectionStrategy.NEVER_PRINT_LOGS);
-
-        this.completeCallback = completeCallback;
-    }
-
-    /**
      * Returns the media information extracted in this session.
      *
      * @return media information extracted or null if the command failed or the output can not be
@@ -89,15 +88,6 @@ public class MediaInformationSession extends AbstractSession implements Session 
      */
     public MediaInformation getMediaInformation() {
         return mediaInformation;
-    }
-
-    /**
-     * Sets the media information extracted in this session.
-     *
-     * @param mediaInformation media information extracted
-     */
-    public void setMediaInformation(final MediaInformation mediaInformation) {
-        this.mediaInformation = mediaInformation;
     }
 
     /**
@@ -122,6 +112,15 @@ public class MediaInformationSession extends AbstractSession implements Session 
     @Override
     public boolean isMediaInformation() {
         return true;
+    }
+
+    /**
+     * Sets the media information extracted in this session.
+     *
+     * @param mediaInformation media information extracted
+     */
+    public void setMediaInformation(final MediaInformation mediaInformation) {
+        this.mediaInformation = mediaInformation;
     }
 
     @Override

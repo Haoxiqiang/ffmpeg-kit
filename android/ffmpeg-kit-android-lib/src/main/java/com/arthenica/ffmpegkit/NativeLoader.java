@@ -21,8 +21,6 @@ package com.arthenica.ffmpegkit;
 
 import android.os.Build;
 
-import com.arthenica.smartexception.java.Exceptions;
-
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -130,64 +128,8 @@ public class NativeLoader {
         loadLibrary("ffmpegkit_abidetect");
     }
 
-    static boolean loadFFmpeg() {
-        boolean nativeFFmpegLoaded = false;
-        boolean nativeFFmpegTriedAndFailed = false;
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-
-            /* LOADING LINKED LIBRARIES MANUALLY ON API < 21 */
-            final List<String> externalLibrariesEnabled = loadExternalLibraries();
-            for (String dependantLibrary : LIBRARIES_LINKED_WITH_CXX) {
-                if (externalLibrariesEnabled.contains(dependantLibrary)) {
-                    loadLibrary("c++_shared");
-                    break;
-                }
-            }
-
-            if (AbiDetect.ARM_V7A.equals(loadNativeAbi())) {
-                try {
-                    for (String ffmpegLibrary : FFMPEG_LIBRARIES) {
-                        loadLibrary(ffmpegLibrary + "_neon");
-                    }
-                    nativeFFmpegLoaded = true;
-                } catch (final Error e) {
-                    android.util.Log.i(FFmpegKitConfig.TAG, String.format("NEON supported armeabi-v7a ffmpeg library not found. Loading default armeabi-v7a library.%s", Exceptions.getStackTraceString(e)));
-                    nativeFFmpegTriedAndFailed = true;
-                }
-            }
-
-            if (!nativeFFmpegLoaded) {
-                for (String ffmpegLibrary : FFMPEG_LIBRARIES) {
-                    loadLibrary(ffmpegLibrary);
-                }
-            }
-        }
-
-        return nativeFFmpegTriedAndFailed;
-    }
-
     static void loadFFmpegKit(final boolean nativeFFmpegTriedAndFailed) {
-        boolean nativeFFmpegKitLoaded = false;
-
-        if (!nativeFFmpegTriedAndFailed && AbiDetect.ARM_V7A.equals(loadNativeAbi())) {
-            try {
-
-                /*
-                 * THE TRY TO LOAD ARM-V7A-NEON FIRST. IF NOT LOAD DEFAULT ARM-V7A
-                 */
-
-                loadLibrary("ffmpegkit_armv7a_neon");
-                nativeFFmpegKitLoaded = true;
-                AbiDetect.setArmV7aNeonLoaded();
-            } catch (final Error e) {
-                android.util.Log.i(FFmpegKitConfig.TAG, String.format("NEON supported armeabi-v7a ffmpegkit library not found. Loading default armeabi-v7a library.%s", Exceptions.getStackTraceString(e)));
-            }
-        }
-
-        if (!nativeFFmpegKitLoaded) {
-            loadLibrary("ffmpegkit");
-        }
+        loadLibrary("ffmpegkit");
     }
 
     @SuppressWarnings("deprecation")

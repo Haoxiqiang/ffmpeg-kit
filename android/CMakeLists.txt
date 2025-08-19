@@ -44,78 +44,93 @@ add_library(cpu-features STATIC IMPORTED)
 set_target_properties(cpu-features PROPERTIES IMPORTED_LOCATION
     ${PREBUILT_DIR}/${ARCH_DIR}/cpu-features/lib/libndk_compat.a)
 
-# 添加 FFmpeg 预构建共享库
-add_library(libavcodec SHARED IMPORTED)
-set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION
-    ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavcodec.so)
-
-add_library(libavfilter SHARED IMPORTED)
-set_target_properties(libavfilter PROPERTIES IMPORTED_LOCATION
-    ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavfilter.so)
-
-add_library(libavdevice SHARED IMPORTED)
-set_target_properties(libavdevice PROPERTIES IMPORTED_LOCATION
-    ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavdevice.so)
-
-add_library(libavformat SHARED IMPORTED)
-set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION
-    ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavformat.so)
-
-add_library(libavutil SHARED IMPORTED)
-set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION
-    ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavutil.so)
-set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-    ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/include)
-
-add_library(libswresample SHARED IMPORTED)
-set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION
-    ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libswresample.so)
-
-add_library(libswscale SHARED IMPORTED)
-set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION
-    ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libswscale.so)
-
-# 如果是 NEON 架构，则添加 NEON 版本的库
+# Add FFmpeg prebuilt shared libraries
 if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
-    # 检查是否存在 NEON 版本
-    if(EXISTS ${PREBUILT_DIR}/android-${ARCH_NAME}-neon${LTS_POSTFIX})
-        set(NEON_ARCH_DIR "android-${ARCH_NAME}-neon${LTS_POSTFIX}")
-        
-        add_library(libavcodec_neon SHARED IMPORTED)
-        set_target_properties(libavcodec_neon PROPERTIES IMPORTED_LOCATION
-            ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavcodec_neon.so)
+    set(NEON_ARCH_DIR "android-${ARCH_NAME}-neon${LTS_POSTFIX}")
 
-        add_library(libavfilter_neon SHARED IMPORTED)
-        set_target_properties(libavfilter_neon PROPERTIES IMPORTED_LOCATION
-            ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavfilter_neon.so)
+    # Create copies of NEON libraries without the neon suffix
+    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavcodec_neon.so 
+                   ${CMAKE_CURRENT_BINARY_DIR}/libavcodec.so 
+                   COPYONLY)
+    add_library(libavcodec SHARED IMPORTED)
+    set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION
+            ${CMAKE_CURRENT_BINARY_DIR}/libavcodec.so)
 
-        add_library(libavdevice_neon SHARED IMPORTED)
-        set_target_properties(libavdevice_neon PROPERTIES IMPORTED_LOCATION
-            ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavdevice_neon.so)
+    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavfilter_neon.so 
+                   ${CMAKE_CURRENT_BINARY_DIR}/libavfilter.so 
+                   COPYONLY)
+    add_library(libavfilter SHARED IMPORTED)
+    set_target_properties(libavfilter PROPERTIES IMPORTED_LOCATION
+            ${CMAKE_CURRENT_BINARY_DIR}/libavfilter.so)
 
-        add_library(libavformat_neon SHARED IMPORTED)
-        set_target_properties(libavformat_neon PROPERTIES IMPORTED_LOCATION
-            ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavformat_neon.so)
+    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavdevice_neon.so 
+                   ${CMAKE_CURRENT_BINARY_DIR}/libavdevice.so 
+                   COPYONLY)
+    add_library(libavdevice SHARED IMPORTED)
+    set_target_properties(libavdevice PROPERTIES IMPORTED_LOCATION
+            ${CMAKE_CURRENT_BINARY_DIR}/libavdevice.so)
 
-        add_library(libavutil_neon SHARED IMPORTED)
-        set_target_properties(libavutil_neon PROPERTIES IMPORTED_LOCATION
-            ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavutil_neon.so)
-        set_target_properties(libavutil_neon PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavformat_neon.so 
+                   ${CMAKE_CURRENT_BINARY_DIR}/libavformat.so 
+                   COPYONLY)
+    add_library(libavformat SHARED IMPORTED)
+    set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION
+            ${CMAKE_CURRENT_BINARY_DIR}/libavformat.so)
+
+    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavutil_neon.so 
+                   ${CMAKE_CURRENT_BINARY_DIR}/libavutil.so 
+                   COPYONLY)
+    add_library(libavutil SHARED IMPORTED)
+    set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION
+            ${CMAKE_CURRENT_BINARY_DIR}/libavutil.so)
+    set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
             ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/include)
 
-        add_library(libswresample_neon SHARED IMPORTED)
-        set_target_properties(libswresample_neon PROPERTIES IMPORTED_LOCATION
-            ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libswresample_neon.so)
+    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libswresample_neon.so 
+                   ${CMAKE_CURRENT_BINARY_DIR}/libswresample.so 
+                   COPYONLY)
+    add_library(libswresample SHARED IMPORTED)
+    set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION
+            ${CMAKE_CURRENT_BINARY_DIR}/libswresample.so)
 
-        add_library(libswscale_neon SHARED IMPORTED)
-        set_target_properties(libswscale_neon PROPERTIES IMPORTED_LOCATION
-            ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libswscale_neon.so)
-            
-        set(NEON_AVAILABLE TRUE)
-    else()
-        set(NEON_AVAILABLE FALSE)
-    endif()
-endif()
+    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libswscale_neon.so 
+                   ${CMAKE_CURRENT_BINARY_DIR}/libswscale.so 
+                   COPYONLY)
+    add_library(libswscale SHARED IMPORTED)
+    set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION
+            ${CMAKE_CURRENT_BINARY_DIR}/libswscale.so)
+else()
+    add_library(libavcodec SHARED IMPORTED)
+    set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION
+        ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavcodec.so)
+
+    add_library(libavfilter SHARED IMPORTED)
+    set_target_properties(libavfilter PROPERTIES IMPORTED_LOCATION
+        ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavfilter.so)
+
+    add_library(libavdevice SHARED IMPORTED)
+    set_target_properties(libavdevice PROPERTIES IMPORTED_LOCATION
+        ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavdevice.so)
+
+    add_library(libavformat SHARED IMPORTED)
+    set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION
+        ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavformat.so)
+
+    add_library(libavutil SHARED IMPORTED)
+    set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION
+        ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavutil.so)
+    set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+        ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/include)
+
+    add_library(libswresample SHARED IMPORTED)
+    set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION
+        ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libswresample.so)
+
+    add_library(libswscale SHARED IMPORTED)
+    set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION
+        ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libswscale.so)
+
+endif ()
 
 # 设置源文件
 set(FFMPEG_KIT_SRC_FILES
@@ -191,27 +206,3 @@ target_link_libraries(ffmpegkit
     libswresample
     libavdevice
     libswscale)
-
-# 如果是 NEON 架构且存在 NEON 版本，则构建 NEON 版本的 ffmpegkit
-if(${ANDROID_ABI} STREQUAL "armeabi-v7a" AND NEON_AVAILABLE)
-    add_library(ffmpegkit_armv7a_neon SHARED
-        ${FFMPEG_KIT_SRC_FILES})
-
-    target_include_directories(ffmpegkit_armv7a_neon PRIVATE
-        ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/include)
-
-    target_compile_definitions(ffmpegkit_armv7a_neon PRIVATE
-        ${FFMPEG_KIT_ARCH_FLAGS})
-
-    target_link_libraries(ffmpegkit_armv7a_neon
-        android
-        log
-        z
-        libavfilter_neon
-        libavformat_neon
-        libavcodec_neon
-        libavutil_neon
-        libswresample_neon
-        libavdevice_neon
-        libswscale_neon)
-endif()

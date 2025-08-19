@@ -32,6 +32,23 @@ public class FFprobeSession extends AbstractSession implements Session {
     /**
      * Builds a new FFprobe session.
      *
+     * @param arguments              command arguments
+     * @param completeCallback       session specific complete callback
+     * @param logCallback            session specific log callback
+     * @param logRedirectionStrategy session specific log redirection strategy
+     */
+    private FFprobeSession(final String[] arguments,
+                           final FFprobeSessionCompleteCallback completeCallback,
+                           final LogCallback logCallback,
+                           final LogRedirectionStrategy logRedirectionStrategy) {
+        super(arguments, logCallback, logRedirectionStrategy);
+
+        this.completeCallback = completeCallback;
+    }
+
+    /**
+     * Builds a new FFprobe session.
+     *
      * @param arguments command arguments
      * @return created session
      */
@@ -78,23 +95,6 @@ public class FFprobeSession extends AbstractSession implements Session {
                                         final LogCallback logCallback,
                                         final LogRedirectionStrategy logRedirectionStrategy) {
         return new FFprobeSession(arguments, completeCallback, logCallback, logRedirectionStrategy);
-    }
-
-    /**
-     * Builds a new FFprobe session.
-     *
-     * @param arguments              command arguments
-     * @param completeCallback       session specific complete callback
-     * @param logCallback            session specific log callback
-     * @param logRedirectionStrategy session specific log redirection strategy
-     */
-    private FFprobeSession(final String[] arguments,
-                           final FFprobeSessionCompleteCallback completeCallback,
-                           final LogCallback logCallback,
-                           final LogRedirectionStrategy logRedirectionStrategy) {
-        super(arguments, logCallback, logRedirectionStrategy);
-
-        this.completeCallback = completeCallback;
     }
 
     /**

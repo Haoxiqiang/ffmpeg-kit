@@ -54,79 +54,34 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class FFmpegKitConfig {
 
-    static class SAFProtocolUrl {
-        private final Integer safId;
-        private final Uri uri;
-        private final String openMode;
-        private final ContentResolver contentResolver;
-        private ParcelFileDescriptor parcelFileDescriptor;
-
-        public SAFProtocolUrl(final Integer safId, final Uri uri, final String openMode, final ContentResolver contentResolver) {
-            this.safId = safId;
-            this.uri = uri;
-            this.openMode = openMode;
-            this.contentResolver = contentResolver;
-        }
-
-        public Integer getSafId() {
-            return safId;
-        }
-
-        public Uri getUri() {
-            return uri;
-        }
-
-        public String getOpenMode() {
-            return openMode;
-        }
-
-        public ContentResolver getContentResolver() {
-            return contentResolver;
-        }
-
-        public void setParcelFileDescriptor(final ParcelFileDescriptor parcelFileDescriptor) {
-            this.parcelFileDescriptor = parcelFileDescriptor;
-        }
-
-        public ParcelFileDescriptor getParcelFileDescriptor() {
-            return parcelFileDescriptor;
-        }
-    }
-
     /**
      * The tag used for logging.
      */
     static final String TAG = "ffmpeg-kit";
-
     /**
      * Prefix of named pipes created by ffmpeg kit.
      */
     static final String FFMPEG_KIT_NAMED_PIPE_PREFIX = "fk_pipe_";
-
     /**
      * Generates ids for named ffmpeg kit pipes and saf protocol urls.
      */
     private static final AtomicInteger uniqueIdGenerator;
-
-    private static Level activeLogLevel;
-
-    /* Session history variables */
-    private static int sessionHistorySize;
     private static final Map<Long, Session> sessionHistoryMap;
     private static final List<Session> sessionHistoryList;
     private static final Object sessionHistoryLock;
-
+    private static final SparseArray<SAFProtocolUrl> safIdMap;
+    private static final SparseArray<SAFProtocolUrl> safFileDescriptorMap;
+    private static Level activeLogLevel;
+    /* Session history variables */
+    private static int sessionHistorySize;
     private static int asyncConcurrencyLimit;
     private static ExecutorService asyncExecutorService;
-
     /* Global callbacks */
     private static LogCallback globalLogCallback;
     private static StatisticsCallback globalStatisticsCallback;
     private static FFmpegSessionCompleteCallback globalFFmpegSessionCompleteCallback;
     private static FFprobeSessionCompleteCallback globalFFprobeSessionCompleteCallback;
     private static MediaInformationSessionCompleteCallback globalMediaInformationSessionCompleteCallback;
-    private static final SparseArray<SAFProtocolUrl> safIdMap;
-    private static final SparseArray<SAFProtocolUrl> safFileDescriptorMap;
     private static LogRedirectionStrategy globalLogRedirectionStrategy;
 
     static {
@@ -135,14 +90,14 @@ public class FFmpegKitConfig {
 
         android.util.Log.i(FFmpegKitConfig.TAG, "Loading ffmpeg-kit.");
 
-        final boolean nativeFFmpegTriedAndFailed = NativeLoader.loadFFmpeg();
+        // final boolean nativeFFmpegTriedAndFailed = NativeLoader.loadFFmpeg();
 
         /* ALL FFMPEG-KIT LIBRARIES LOADED AT STARTUP */
         Abi.class.getName();
         FFmpegKit.class.getName();
         FFprobeKit.class.getName();
 
-        NativeLoader.loadFFmpegKit(nativeFFmpegTriedAndFailed);
+        NativeLoader.loadFFmpegKit(false);
 
         uniqueIdGenerator = new AtomicInteger(1);
 
@@ -977,7 +932,7 @@ public class FFmpegKitConfig {
                 int displayNameColumn = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME);
                 if (displayNameColumn == -1) {
                     displayName = "unknown";
-                } else  {
+                } else {
                     displayName = cursor.getString(displayNameColumn);
                 }
             }
@@ -1501,5 +1456,44 @@ public class FFmpegKitConfig {
      * @param signum signal number
      */
     private native static void ignoreNativeSignal(final int signum);
+
+    static class SAFProtocolUrl {
+        private final Integer safId;
+        private final Uri uri;
+        private final String openMode;
+        private final ContentResolver contentResolver;
+        private ParcelFileDescriptor parcelFileDescriptor;
+
+        public SAFProtocolUrl(final Integer safId, final Uri uri, final String openMode, final ContentResolver contentResolver) {
+            this.safId = safId;
+            this.uri = uri;
+            this.openMode = openMode;
+            this.contentResolver = contentResolver;
+        }
+
+        public Integer getSafId() {
+            return safId;
+        }
+
+        public Uri getUri() {
+            return uri;
+        }
+
+        public String getOpenMode() {
+            return openMode;
+        }
+
+        public ContentResolver getContentResolver() {
+            return contentResolver;
+        }
+
+        public ParcelFileDescriptor getParcelFileDescriptor() {
+            return parcelFileDescriptor;
+        }
+
+        public void setParcelFileDescriptor(final ParcelFileDescriptor parcelFileDescriptor) {
+            this.parcelFileDescriptor = parcelFileDescriptor;
+        }
+    }
 
 }

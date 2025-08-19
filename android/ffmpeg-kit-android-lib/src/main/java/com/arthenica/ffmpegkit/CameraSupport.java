@@ -19,6 +19,9 @@
 
 package com.arthenica.ffmpegkit;
 
+import static android.content.Context.CAMERA_SERVICE;
+import static com.arthenica.ffmpegkit.FFmpegKitConfig.TAG;
+
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -29,9 +32,6 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.content.Context.CAMERA_SERVICE;
-import static com.arthenica.ffmpegkit.FFmpegKitConfig.TAG;
 
 /**
  * <p>Helper class to detect camera devices that can be used in
