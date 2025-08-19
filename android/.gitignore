@@ -7,3 +7,4 @@
 /ffmpeg-kit-android-lib/build/
 *.tmp
 /.vscode
+/ffmpeg-kit-android-lib/.cxx/
