@@ -343,51 +343,20 @@ if [[ -n ${ANDROID_ARCHITECTURES} ]]; then
   echo -e "DEBUG: Copied source.txt successfully\n" 1>>"${BASEDIR}"/build.log 2>&1
 
   # BUILD NATIVE LIBRARY
-  if [[ ${SKIP_ffmpeg_kit} -ne 1 ]]; then
-    if [ "$(is_darwin_arm64)" == "1" ]; then
-       arch -x86_64 "${ANDROID_NDK_ROOT}"/ndk-build -B 1>>"${BASEDIR}"/build.log 2>&1
-    else
-      "${ANDROID_NDK_ROOT}"/ndk-build -B 1>>"${BASEDIR}"/build.log 2>&1
-    fi
 
-    if [ $? -eq 0 ]; then
-      echo "ok"
-    else
-      echo "failed"
-      exit 1
-    fi
-  else
-    echo "skipped"
-  fi
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[1;33m'
+  NC='\033[0m' # No Color
 
-  echo -e -n "\n"
-
-  # DO NOT BUILD ANDROID ARCHIVE
-  if [[ ${NO_ARCHIVE} -ne 1 ]]; then
-
-    echo -e -n "\nCreating Android archive under prebuilt: "
-
-    # BUILD ANDROID ARCHIVE
-    rm -f "${BASEDIR}"/android/ffmpeg-kit-android-lib/build/outputs/aar/ffmpeg-kit-release.aar 1>>"${BASEDIR}"/build.log 2>&1
-    ./gradlew ffmpeg-kit-android-lib:clean ffmpeg-kit-android-lib:assembleRelease ffmpeg-kit-android-lib:testReleaseUnitTest 1>>"${BASEDIR}"/build.log 2>&1
-    if [ $? -ne 0 ]; then
-      echo -e "failed\n"
-      exit 1
-    fi
-
-    # COPY ANDROID ARCHIVE TO PREBUILT DIRECTORY
-    FFMPEG_KIT_AAR="${BASEDIR}/prebuilt/$(get_aar_directory)/ffmpeg-kit"
-    rm -rf "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
-    mkdir -p "${FFMPEG_KIT_AAR}" 1>>"${BASEDIR}"/build.log 2>&1
-    cp "${BASEDIR}"/android/ffmpeg-kit-android-lib/build/outputs/aar/ffmpeg-kit-release.aar "${FFMPEG_KIT_AAR}"/ffmpeg-kit.aar 1>>"${BASEDIR}"/build.log 2>&1
-    if [ $? -ne 0 ]; then
-      echo -e "failed\n"
-      exit 1
-    fi
-
-    echo -e "INFO: Created ffmpeg-kit Android archive successfully.\n" 1>>"${BASEDIR}"/build.log 2>&1
-    echo -e "ok\n"
-  else
-    echo -e "INFO: Skipped creating Android archive.\n" 1>>"${BASEDIR}"/build.log 2>&1
-  fi
+  echo -e "${YELLOW}Building with API level 26 and NDK 29.0.13599879...${NC}"
+  ./gradlew clean
+  ./gradlew :ffmpeg-kit-android-lib:assembleRelease \
+    -Pandroid.compileSdk=33 \
+    -Pandroid.minSdk=26 \
+    -Pandroid.targetSdk=33 \
+    -Pandroid.ndkVersion=29.0.13599879 \
+    -Pandroid.native.buildOutput=verbose \
+    --info \
+    --stacktrace
 fi

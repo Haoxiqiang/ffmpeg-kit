@@ -16,7 +16,7 @@ set(PREBUILT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../prebuilt)
 # 根据架构和特性设置路径
 # 注意：实际目录名与 ANDROID_ABI 不完全一致，需要映射
 if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
-    set(ARCH_NAME "arm")
+    set(ARCH_NAME "arm-neon")
 elseif(${ANDROID_ABI} STREQUAL "arm64-v8a")
     set(ARCH_NAME "arm64")
 elseif(${ANDROID_ABI} STREQUAL "x86")
@@ -44,93 +44,35 @@ add_library(cpu-features STATIC IMPORTED)
 set_target_properties(cpu-features PROPERTIES IMPORTED_LOCATION
     ${PREBUILT_DIR}/${ARCH_DIR}/cpu-features/lib/libndk_compat.a)
 
-# Add FFmpeg prebuilt shared libraries
-if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
-    set(NEON_ARCH_DIR "android-${ARCH_NAME}-neon${LTS_POSTFIX}")
-
-    # Create copies of NEON libraries without the neon suffix
-    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavcodec_neon.so 
-                   ${CMAKE_CURRENT_BINARY_DIR}/libavcodec.so 
-                   COPYONLY)
-    add_library(libavcodec SHARED IMPORTED)
-    set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_CURRENT_BINARY_DIR}/libavcodec.so)
-
-    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavfilter_neon.so 
-                   ${CMAKE_CURRENT_BINARY_DIR}/libavfilter.so 
-                   COPYONLY)
-    add_library(libavfilter SHARED IMPORTED)
-    set_target_properties(libavfilter PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_CURRENT_BINARY_DIR}/libavfilter.so)
-
-    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavdevice_neon.so 
-                   ${CMAKE_CURRENT_BINARY_DIR}/libavdevice.so 
-                   COPYONLY)
-    add_library(libavdevice SHARED IMPORTED)
-    set_target_properties(libavdevice PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_CURRENT_BINARY_DIR}/libavdevice.so)
-
-    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavformat_neon.so 
-                   ${CMAKE_CURRENT_BINARY_DIR}/libavformat.so 
-                   COPYONLY)
-    add_library(libavformat SHARED IMPORTED)
-    set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_CURRENT_BINARY_DIR}/libavformat.so)
-
-    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libavutil_neon.so 
-                   ${CMAKE_CURRENT_BINARY_DIR}/libavutil.so 
-                   COPYONLY)
-    add_library(libavutil SHARED IMPORTED)
-    set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_CURRENT_BINARY_DIR}/libavutil.so)
-    set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
-            ${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/include)
-
-    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libswresample_neon.so 
-                   ${CMAKE_CURRENT_BINARY_DIR}/libswresample.so 
-                   COPYONLY)
-    add_library(libswresample SHARED IMPORTED)
-    set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_CURRENT_BINARY_DIR}/libswresample.so)
-
-    configure_file(${PREBUILT_DIR}/${NEON_ARCH_DIR}/ffmpeg/lib/libswscale_neon.so 
-                   ${CMAKE_CURRENT_BINARY_DIR}/libswscale.so 
-                   COPYONLY)
-    add_library(libswscale SHARED IMPORTED)
-    set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION
-            ${CMAKE_CURRENT_BINARY_DIR}/libswscale.so)
-else()
-    add_library(libavcodec SHARED IMPORTED)
-    set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION
+add_library(libavcodec SHARED IMPORTED)
+set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavcodec.so)
 
-    add_library(libavfilter SHARED IMPORTED)
-    set_target_properties(libavfilter PROPERTIES IMPORTED_LOCATION
+add_library(libavfilter SHARED IMPORTED)
+set_target_properties(libavfilter PROPERTIES IMPORTED_LOCATION
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavfilter.so)
 
-    add_library(libavdevice SHARED IMPORTED)
-    set_target_properties(libavdevice PROPERTIES IMPORTED_LOCATION
+add_library(libavdevice SHARED IMPORTED)
+set_target_properties(libavdevice PROPERTIES IMPORTED_LOCATION
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavdevice.so)
 
-    add_library(libavformat SHARED IMPORTED)
-    set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION
+add_library(libavformat SHARED IMPORTED)
+set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavformat.so)
 
-    add_library(libavutil SHARED IMPORTED)
-    set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION
+add_library(libavutil SHARED IMPORTED)
+set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libavutil.so)
-    set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/include)
 
-    add_library(libswresample SHARED IMPORTED)
-    set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION
+add_library(libswresample SHARED IMPORTED)
+set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libswresample.so)
 
-    add_library(libswscale SHARED IMPORTED)
-    set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION
+add_library(libswscale SHARED IMPORTED)
+set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libswscale.so)
-
-endif ()
 
 # 设置源文件
 set(FFMPEG_KIT_SRC_FILES

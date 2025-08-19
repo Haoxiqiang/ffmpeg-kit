@@ -39,12 +39,12 @@ case ${ARCH} in
 arm-v7a)
   TARGET_CPU="armv7-a"
   TARGET_ARCH="armv7-a"
-  ASM_OPTIONS=" --disable-neon --enable-asm --enable-inline-asm"
+  ASM_OPTIONS=" --enable-neon --enable-asm --enable-inline-asm"
   ;;
 arm-v7a-neon)
   TARGET_CPU="armv7-a"
   TARGET_ARCH="armv7-a"
-  ASM_OPTIONS=" --enable-neon --enable-asm --enable-inline-asm --build-suffix=_neon"
+  ASM_OPTIONS=" --enable-neon --enable-asm --enable-inline-asm"
   ;;
 arm64-v8a)
   TARGET_CPU="armv8-a"

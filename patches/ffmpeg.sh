@@ -417,10 +417,24 @@ fi
 # LITE OPTIONS
 #--enable-small optimize for size instead of speed
 LITE_OPTIONS="$LITE_OPTIONS --enable-small"
-LITE_OPTIONS="$LITE_OPTIONS --disable-avfilter"
-LITE_OPTIONS="$LITE_OPTIONS --disable-network"
-LITE_OPTIONS="$LITE_OPTIONS --disable-avdevice"
-LITE_OPTIONS="$LITE_OPTIONS --disable-ffplay"
+LITE_OPTIONS="$LITE_OPTIONS --disable-avdevice --disable-avfilter --disable-network"
+
+LITE_OPTIONS="$LITE_OPTIONS --disable-hwaccels"
+LITE_OPTIONS="$LITE_OPTIONS --enable-hwaccel=*_mediacodec"
+
+LITE_OPTIONS="$LITE_OPTIONS --disable-encoders --disable-parsers --disable-demuxers --disable-muxers --disable-protocols --disable-bsfs --disable-devices --disable-outdevs --disable-indevs --disable-filters "
+
+LITE_OPTIONS="$LITE_OPTIONS --disable-decoders"
+
+DECODER_AUDIO_SUPPORT=(aac ac3 eac3 truehd dca vorbis opus amrnb amrwb flac alac pcm_mulaw pcm_alaw dst)
+DECODER_VIDEO_SUPPORT=(h264 libvpx_vp8 libvpx_vp9 hevc mpeg4 flv mpegvideo mpeg2video av1 wmv1 wmv2 wmv3)
+for decoder in "${DECODER_AUDIO_SUPPORT[@]}"; do
+  LITE_OPTIONS="$LITE_OPTIONS --enable-decoder=${decoder}"
+done
+for decoder in "${DECODER_VIDEO_SUPPORT[@]}"; do
+  LITE_OPTIONS="$LITE_OPTIONS --enable-decoder=${decoder}"
+done
+
 # Component options:
 LITE_OPTIONS="$LITE_OPTIONS --disable-w32threads --disable-os2threads --disable-iconv"
 
@@ -483,6 +497,9 @@ LITE_OPTIONS="$LITE_OPTIONS --disable-w32threads --disable-os2threads --disable-
   --disable-nvenc \
   --disable-vaapi \
   --disable-vdpau \
+  --disable-ffmpeg \
+  --disable-ffplay \
+  --disable-ffprobe \
   ${LITE_OPTIONS} \
   ${CONFIGURE_POSTFIX} 1>>"${BASEDIR}"/build.log 2>&1
 
@@ -524,21 +541,14 @@ fi
 # create ffmpeg unit so file
 echo "\n"
 rm libavcodec/log2_tab.o
-rm libavcodec/half2float.o
-rm libavcodec/reverse.o
-
 rm libavformat/golomb_tab.o
 rm libavformat/log2_tab.o
 rm libavformat/to_upper4.o
-rm libavformat/ac3_channel_layout_tab.o
-rm libavformat/dca_sample_rate_tab.o
-rm libavformat/jpegtables.o
-rm libavformat/mpeg4audio_sample_rates.o
-rm libavformat/mpegaudiotabs.o
-
+rm libavfilter/log2_tab.o
+rm libavcodec/reverse.o
 rm libswresample/log2_tab.o
-
 rm libswscale/log2_tab.o
+rm libavdevice/reverse.o
 
 get_asm_sub_dirs() {
   case ${ARCH} in
@@ -560,7 +570,7 @@ get_asm_sub_dirs() {
   esac
 }
 
-FF_MODULE_DIRS="compat libavutil libswresample libswscale libavcodec libavformat"
+FF_MODULE_DIRS="compat libavutil libswresample libswscale libavcodec libavfilter libavformat libavdevice"
 FF_ASSEMBLER_SUB_DIRS=$(get_asm_sub_dirs)
 FF_C_OBJ_FILES=
 FF_ASM_OBJ_FILES=
@@ -611,7 +621,6 @@ overwrite_file "${BASEDIR}"/src/ffmpeg/libavcodec/arm/mathops.h "${FFMPEG_LIBRAR
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/network.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/network.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/os_support.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/os_support.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavformat/url.h "${FFMPEG_LIBRARY_PATH}"/include/libavformat/url.h 1>>"${BASEDIR}"/build.log 2>&1
-overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/attributes_internal.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/attributes_internal.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/bprint.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/bprint.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/getenv_utf8.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/getenv_utf8.h 1>>"${BASEDIR}"/build.log 2>&1
 overwrite_file "${BASEDIR}"/src/ffmpeg/libavutil/internal.h "${FFMPEG_LIBRARY_PATH}"/include/libavutil/internal.h 1>>"${BASEDIR}"/build.log 2>&1

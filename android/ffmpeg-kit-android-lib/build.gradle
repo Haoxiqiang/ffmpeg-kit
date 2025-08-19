@@ -80,6 +80,16 @@ android {
             withSourcesJar()
         }
     }
+
+    libraryVariants.all { variant ->
+        variant.outputs.each { output ->
+            if (variant.buildType.name == 'release') {
+                def baseName = "ffmpeg-kit"
+                def version = defaultConfig.versionName
+                output.outputFileName = "${baseName}-v${version}.aar"
+            }
+        }
+    }
 }
 
 task javadoc(type: Javadoc) {
