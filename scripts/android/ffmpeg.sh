@@ -419,8 +419,18 @@ fi
 LITE_OPTIONS="$LITE_OPTIONS --enable-small"
 LITE_OPTIONS="$LITE_OPTIONS --disable-network"
 LITE_OPTIONS="$LITE_OPTIONS --disable-ffplay"
-# Component options:
-LITE_OPTIONS="$LITE_OPTIONS --disable-w32threads --disable-os2threads --disable-iconv"
+
+LITE_OPTIONS="$LITE_OPTIONS --disable-hwaccels"
+LITE_OPTIONS="$LITE_OPTIONS --enable-hwaccel=*_mediacodec"
+
+LITE_OPTIONS="$LITE_OPTIONS --disable-encoders"
+LITE_OPTIONS="$LITE_OPTIONS --disable-filters"
+
+LITE_OPTIONS="$LITE_OPTIONS --disable-bsfs"
+LITE_OPTIONS="$LITE_OPTIONS --disable-devices"
+LITE_OPTIONS="$LITE_OPTIONS --disable-indevs"
+LITE_OPTIONS="$LITE_OPTIONS --disable-outdevs"
+LITE_OPTIONS="$LITE_OPTIONS --disable-iconv"
 
 ###################################################################
 

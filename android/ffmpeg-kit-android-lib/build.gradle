@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdk project.hasProperty('android.minSdk') ? project.property('android.minSdk').toInteger() : 26
         targetSdk project.hasProperty('android.targetSdk') ? project.property('android.targetSdk').toInteger() : 33
-        versionCode 290600
+        versionCode 260600
         versionName "6.0.LTS"
         project.archivesBaseName = "ffmpeg-kit"
         consumerProguardFiles "consumer-rules.pro"

@@ -132,7 +132,6 @@ public class NativeLoader {
         loadLibrary("ffmpegkit");
     }
 
-    @SuppressWarnings("deprecation")
     static String getDeviceDebugInformation() {
         final StringBuilder stringBuilder = new StringBuilder();
 
@@ -145,19 +144,12 @@ public class NativeLoader {
         stringBuilder.append(", api level: ");
         stringBuilder.append(Build.VERSION.SDK_INT);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            stringBuilder.append(", abis: ");
-            stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_ABIS));
-            stringBuilder.append(", 32bit abis: ");
-            stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_32_BIT_ABIS));
-            stringBuilder.append(", 64bit abis: ");
-            stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_64_BIT_ABIS));
-        } else {
-            stringBuilder.append(", cpu abis: ");
-            stringBuilder.append(Build.CPU_ABI);
-            stringBuilder.append(", cpu abi2s: ");
-            stringBuilder.append(Build.CPU_ABI2);
-        }
+        stringBuilder.append(", abis: ");
+        stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_ABIS));
+        stringBuilder.append(", 32bit abis: ");
+        stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_32_BIT_ABIS));
+        stringBuilder.append(", 64bit abis: ");
+        stringBuilder.append(FFmpegKitConfig.argumentsToString(Build.SUPPORTED_64_BIT_ABIS));
 
         return stringBuilder.toString();
     }

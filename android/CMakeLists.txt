@@ -1,20 +1,20 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-# 设置构建类型
+# Set build type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-# 设置编译器标志
+# Set compiler flags
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -DANDROID -DFFMPEG_KIT_LTS -DFFMPEG_KIT_BUILD_DATE=20250818 -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DANDROID -DFFMPEG_KIT_LTS -DFFMPEG_KIT_BUILD_DATE=20250818 -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--hash-style=both")
 
-# 定义预构建库路径
+# Define prebuilt library path
 set(PREBUILT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../prebuilt)
 
-# 根据架构和特性设置路径
-# 注意：实际目录名与 ANDROID_ABI 不完全一致，需要映射
+# Set path based on architecture and features
+# Note: Actual directory names do not exactly match ANDROID_ABI, mapping required
 if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
     set(ARCH_NAME "arm-neon")
 elseif(${ANDROID_ABI} STREQUAL "arm64-v8a")
@@ -33,13 +33,13 @@ endif()
 
 set(ARCH_DIR "android-${ARCH_NAME}${LTS_POSTFIX}")
 
-# 设置 FFmpeg 头文件路径
+# Set FFmpeg header file path
 set(FFMPEG_INCLUDE_DIRS ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/include)
 
-# 设置 cpu-features 头文件路径
+# Set cpu-features header file path
 set(CPU_FEATURES_INCLUDE_DIRS ${PREBUILT_DIR}/${ARCH_DIR}/cpu-features/include/ndk_compat)
 
-# 添加 cpu-features 静态库
+# Add cpu-features static library
 add_library(cpu-features STATIC IMPORTED)
 set_target_properties(cpu-features PROPERTIES IMPORTED_LOCATION
     ${PREBUILT_DIR}/${ARCH_DIR}/cpu-features/lib/libndk_compat.a)
@@ -74,7 +74,7 @@ add_library(libswscale SHARED IMPORTED)
 set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION
         ${PREBUILT_DIR}/${ARCH_DIR}/ffmpeg/lib/libswscale.so)
 
-# 设置源文件
+# Set source files
 set(FFMPEG_KIT_SRC_FILES
     ffmpeg-kit-android-lib/src/main/cpp/ffmpegkit.c
     ffmpeg-kit-android-lib/src/main/cpp/ffprobekit.c
@@ -94,12 +94,12 @@ set(FFMPEG_KIT_SRC_FILES
     ffmpeg-kit-android-lib/src/main/cpp/fftools_thread_queue.c
 )
 
-# 添加 LTS 支持源文件（如果需要）
+# Add LTS support source files (if needed)
 if(${ANDROID_PLATFORM_LEVEL} LESS 18)
     list(APPEND FFMPEG_KIT_SRC_FILES ffmpeg-kit-android-lib/src/main/cpp/android_lts_support.c)
 endif()
 
-# 设置架构标志
+# Set architecture flags
 if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
     set(FFMPEG_KIT_ARCH_FLAGS FFMPEG_KIT_ARM_V7A)
 elseif(${ANDROID_ABI} STREQUAL "arm64-v8a")
@@ -110,7 +110,7 @@ elseif(${ANDROID_ABI} STREQUAL "x86_64")
     set(FFMPEG_KIT_ARCH_FLAGS FFMPEG_KIT_X86_64)
 endif()
 
-# 构建 ffmpegkit_abidetect 库
+# Build ffmpegkit_abidetect library
 add_library(ffmpegkit_abidetect SHARED
     ffmpeg-kit-android-lib/src/main/cpp/ffmpegkit_abidetect.c)
 
@@ -127,7 +127,7 @@ target_link_libraries(ffmpegkit_abidetect
     z
     cpu-features)
 
-# 构建主 ffmpegkit 库
+# Build main ffmpegkit library
 add_library(ffmpegkit SHARED
     ${FFMPEG_KIT_SRC_FILES})
 
